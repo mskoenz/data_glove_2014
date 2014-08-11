@@ -1,0 +1,4 @@
+**/*.pyc
+**/__pycache__
+src/addon/.git
+src/addon/.gitignore
