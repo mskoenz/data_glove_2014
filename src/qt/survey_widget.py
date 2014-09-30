@@ -29,7 +29,7 @@ class Q2survey(QWidget):
         quali = eval("lg.survey_quali_" + l)
         quali.insert(1, lg.survey_hedger + quali[0])
         quali.insert(-1, lg.survey_hedger + quali[-1])
-        exec("Q2survey.f_" + l + " = types.MethodType(lambda self, x: self.quali[" + str(i_l) + "].setText(lg.survey_quali_" + l + "[x]), self)")
+        setattr(Q2survey, "f_" + l, lambda self, x: self.quali[i_l].setText(eval("lg.survey_quali_" + l)[x]))
         
     def init_ui(self):
         """

@@ -42,7 +42,6 @@ def to_number(string):
     except:
         return string
 
-
 #------------------- type checks ------------------- 
 def is_list(obj):
     """
