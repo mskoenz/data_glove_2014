@@ -6,6 +6,7 @@
 # File:    calibrate.py
 
 from src_import import *
+from serializer import *
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -19,24 +20,41 @@ class calibrate(QWidget):
         self.sp = QSerialPort()
         self.sp.setPortName("/dev/ttyUSB0")
         self.sp.open(QIODevice.ReadWrite)
+        
         time.sleep(2)
+        
+        self.pos = pos_class(self.sp)
+        self.n_gest = n_gest_class(self.sp)
+        self.gest_0 = gest_class(self.sp, 0)
         self.show()
     
-    def send(self):
-        self.sp.write(b's')
-        #~ self.sp.waitForBytesWritten(1)
-        self.sp.waitForReadyRead(9)
-        d = self.sp.readAll()
-        i = [int(c) for c in d.data()]
-        print(i)
+    def write(self, obj):
+        obj.write()
+    
+    def read(self, obj):
+        obj.read()
         
     def keyPressEvent(self, e):
-        self.send()
+        if e.key() == Qt.Key_R:
+            self.read(self.gest_0)
+            print(self.gest_0)
+        if e.key() == Qt.Key_W:
+            self.n_gest.n_ += 1
+            print(self.gest_0)
+            self.write(self.gest_0)
+        if e.key() == Qt.Key_E:
+            self.sp.write(b'e')
+            print("EEPROM")
+        if e.key() == Qt.Key_N:
+            self.read(self.n_gest)
+            print(self.n_gest)
+        if e.key() == Qt.Key_P:
+            self.read(self.pos)
+            print(self.pos)
+        
 
 if __name__ == "__main__":
     print("calibrate.py")
     app = QApplication(sys.argv)
     c = calibrate()
     app.exec_()
-    
-    
