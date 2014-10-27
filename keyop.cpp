@@ -15,7 +15,7 @@
 #include <com/uart.hpp>
 #include <com/i2c.hpp>
 
-//~ #include <device/bluesmirf_hid.hpp>
+#include <device/bluesmirf_hid.hpp>
 #include <device/MMA8452.hpp>
 
 #include "position.hpp"
@@ -29,14 +29,34 @@ typedef ustd::array<uint8_t, 9> array_type;
 
 class program {
 public:
-    //~ program(): keyboard_(SOFTWARE_SERIAL_RX, SOFTWARE_SERIAL_TX) {
-    program() {
-        
+    program(): keyboard_(SOFTWARE_SERIAL_RX, SOFTWARE_SERIAL_TX) {
         setup();
     }
     void setup() {
         ustd::cout.init(keyop::speed);
-        com::eeprom.clear();
+        
+        //~ keyboard_.change_hid();
+        //~ com::eeprom.clear();
+        
+        data_.push_back(key_data_struct());
+        data_[0].trigger = 0;
+        data_[0].key = uint8_t(key::y);
+        
+        data_.push_back(key_data_struct());
+        data_[1].trigger = 1;
+        data_[1].key = uint8_t(key::u);
+        
+        data_.push_back(key_data_struct());
+        data_[2].trigger = 2;
+        data_[2].key = uint8_t(key::i);
+        
+        data_.push_back(key_data_struct());
+        data_[3].trigger = 3;
+        data_[3].key = uint8_t(key::o);
+        
+        data_.push_back(key_data_struct());
+        data_[4].trigger = 4;
+        data_[4].key = uint8_t(key::p);
         
         //~ com::eeprom & data_;
         
@@ -46,9 +66,9 @@ public:
         
         com::i2c_begin();
         //~ acc_meter_.init();
-        //~ keyboard_.connect();
         
         delay(150);
+        keyboard_.connect();
     }
     void update() {
         tool::clock.update();
@@ -72,9 +92,13 @@ public:
         delayMicroseconds(100);
         com::i2cin(core::i2c_adress) >> curr_gest;
         
+        depreller_.update((31 & curr_gest));
+        for(uint8_t i = 0; i < data_.size(); ++i) {
+            btn_[i].update(depreller_.state() == data_[i].trigger);
+        }
         //~ depreller_.update((max_ind << 5) + (31 & curr_gest));
         //~ for(uint8_t i = 0; i < data_.size(); ++i) {
-            //~ btn_[i].update((depreller_.state() & (data_[i].mask)) == data_[i].trigger
+            //~ btn_[i].update((depreller_.state() & (data_[i].mask)) == data_[i].trigger;
                        //~ and (depreller_.old_state() & (data_[i].pre_mask)) == data_[i].pre_trigger);
         //~ }
         //~ DEBUG_VAR(curr_gest)
@@ -124,11 +148,23 @@ public:
                 com::i2cout(core::i2c_adress) << core::write_to_eeprom << ustd::endl;
             } else if(in == core::remove_all_gestures) {
                 com::i2cout(core::i2c_adress) << core::remove_all_gestures << ustd::endl;
+            } else if(in == core::reset_glove) {
+                com::i2cout(core::i2c_adress) << core::reset_glove << ustd::endl;
+                util::reset();
+            } else if(in == core::reset_time) {
+                com::i2cout(core::i2c_adress) << core::reset_time << ustd::endl;
+            } else if(in == core::read_time) {
+                com::i2cout(core::i2c_adress) << core::read_time << ustd::endl;
+                delayMicroseconds(200);
+                uint32_t t;
+                com::i2cin(core::i2c_adress) >> t;
+                pipe << t;
+            
+            
             } else if(in == core::current_gesture) {
                 com::i2cout(core::i2c_adress) << core::current_gesture << ustd::endl;
                 com::i2cin(core::i2c_adress) >> in;
                 pipe << in;
-            
             //~ } else if(in == keyop::read_key) {
                 //~ com::uart >> in;
                 //~ com::uart << data_[in];
@@ -145,12 +181,16 @@ public:
             }
         }
         
-        //~ for(uint8_t i = 0; i < data_.size(); ++i) {
-            //~ if(btn_[i] == state::falling)
-                //~ keyboard_.press(data_[i].key, data_[i].mod);
-            //~ else if(btn_[i] == state::rising)
-                //~ keyboard_.release(data_[i].key, data_[i].mod);
-        //~ }
+        for(uint8_t i = 0; i < data_.size(); ++i) {
+            if(btn_[i] == state::falling) {
+                ustd::cout << data_[i].key << ustd::endl;
+                keyboard_.press(data_[i].key, data_[i].mod);
+            }
+            else if(btn_[i] == state::rising) {
+                ustd::cout << data_[i].key << ustd::endl;
+                keyboard_.release(data_[i].key, data_[i].mod);
+            }
+        }
         //~ diag::speed_report();
     }
     
@@ -165,8 +205,8 @@ private:
     ustd::static_vector<key_data_struct, keyop::max_keys> data_;
     
     //~ device::MMA8452_class acc_meter_;
-    ustd::lowpass_filter<double, 40> g[3];
-    //~ device::bluesmirf_hid_class keyboard_;
+    //~ ustd::lowpass_filter<double, 40> g[3];
+    device::bluesmirf_hid_class keyboard_;
 };
 
 #include <main.hpp>

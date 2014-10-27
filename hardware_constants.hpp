@@ -76,8 +76,8 @@ inline namespace version_3 {
     //because I have 9 sensors, a 8:1 MUX isn't enough. !! I start counting at 0 !!
     uint8_t const SENSOR8_PIN = A1;
 
-    uint8_t const SOFTWARE_SERIAL_RX = 9;
-    uint8_t const SOFTWARE_SERIAL_TX = 10;
+    uint8_t const SOFTWARE_SERIAL_RX = A1;
+    uint8_t const SOFTWARE_SERIAL_TX = A2;
     
     //in order to get values between 0-255
     int const cutoff = 1024-680; 

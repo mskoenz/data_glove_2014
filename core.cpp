@@ -7,6 +7,7 @@
 #define ADVANCED_INTERRUPTS
 
 #include <util/fast_io.hpp>
+#include <util/reset.hpp>
 #include <ustd.hpp>
 #include <diag.hpp>
 #include <tool.hpp>
@@ -23,9 +24,6 @@
 
 char in;
 
-ustd::static_vector<uint8_t, 100> buf;
-com::oss_class<ustd::static_vector<uint8_t, 100>, 100> iss(buf);
-
 class program {
 public:
     program() {
@@ -37,7 +35,6 @@ public:
         red_ = state::off;
         blue_ = state::off;
         green_ = state::flash;
-        
         
         //~ com::eeprom.clear();
         com::eeprom & gest_;
@@ -211,19 +208,30 @@ public:
         } else if(in == core::write_n_gestures) {
             com::i2cin >> in;
             gest_.set_size(in);
+        } else if(in == core::current_gesture) {
+            com::i2cout << curr_gest_;
+            
+            
         } else if(in == core::write_to_eeprom) {
             com::eeprom << gest_;
         } else if(in == core::remove_all_gestures) {
             gest_.clear();
-        } else if(in == core::current_gesture) {
-            com::i2cout << curr_gest_;
+        } else if(in == core::reset_glove) {
+            util::reset();
+        } else if(in == core::reset_time) {
+            tool::clock.reset();
+        } else if(in == core::read_time) {
+            com::i2cout << tool::clock.millis();
         }
         
-        //~ if(in == 'r') {
-            //~ com::i2cout << gest_[0];
-        //~ }
-        //~ if(in == 's') {
-        //~ }
+        } else if(in == core::begin_learning) {
+            ;
+        } else if(in == core::learning_progress) {
+            ;
+        } else if(in == core::end_learning) {
+            ;
+        }
+        
         //~ if(in == 'l') {
             //~ if(n > 1) {
                 //~ com::i2cin >> in;

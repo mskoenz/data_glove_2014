@@ -19,10 +19,19 @@ namespace core {
     uint8_t const read_gesture = 'r';
     uint8_t const read_n_gestures = 'n';
     uint8_t const write_n_gestures = 'm';
-    uint8_t const write_to_eeprom = 'e';
-    uint8_t const remove_all_gestures = 'd';
     uint8_t const current_gesture = 'c';
     uint8_t const learn_gesture = 'l';
+    
+    uint8_t const remove_all_gestures = 'd';
+    uint8_t const write_to_eeprom = 'e';
+    uint8_t const reset_glove = 'x';
+    
+    uint8_t const reset_time = 'y';
+    uint8_t const read_time = 't';
+    
+    uint8_t const begin_learning = 'a';
+    uint8_t const learning_progress = 'b';
+    uint8_t const end_learning = 'c';
     
 }//end namespace cmd
 
