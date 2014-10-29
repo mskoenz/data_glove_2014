@@ -21,7 +21,7 @@ class calibrate(QWidget):
         self.sp.setPortName("/dev/ttyUSB0")
         self.sp.open(QIODevice.ReadWrite)
         
-        time.sleep(2)
+        #~ time.sleep(2)
         
         self.pos = pos_class(self.sp)
         self.n_gest = n_gest_class(self.sp)

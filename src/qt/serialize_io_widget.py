@@ -35,6 +35,10 @@ class Q2SerializeIOWidget(QWidget):
                             , remove_all_class(self.sp)
                             , reset_glove_class(self.sp)
                             , reset_time_class(self.sp)
+                            , hist_class(self.sp)
+                            , begin_learning_class(self.sp)
+                            , learning_progress_class(self.sp)
+                            , end_learning_class(self.sp)
                            ]
         
         
@@ -80,7 +84,7 @@ class Q2SerializeIOWidget(QWidget):
         #=================== layout ===================
         grid = QGridLayout(self)
         
-        n_layout = 6
+        n_layout = 8
         
         for w, w_i in zipi(self.lbls):
             grid.addWidget(w, 2*(w_i%n_layout), 3*(w_i//n_layout), 2, 1)

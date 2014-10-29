@@ -6,3 +6,8 @@ from .eeprom_write import *
 from .remove_all import *
 from .reset_glove import *
 from .reset_time import *
+from .hist import *
+from .begin_learning import *
+from .learning_progress import *
+from .end_learning import *
+from .current_gest import *

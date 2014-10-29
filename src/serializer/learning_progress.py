@@ -2,26 +2,23 @@
 # -*- coding: utf-8 -*-
 # 
 # Author:  Mario S. Könz <mskoenz@gmx.net>
-# Date:    09.10.2014 10:14:02 CEST
-# File:    pos.py
+# Date:    29.10.2014 09:20:32 CET
+# File:    learning_progress.py
 
 import sys
 
-class n_gest_class(object):
+class learning_progress_class(object):
     def __init__ (self, com):
         self.data_ = 0
         self.com = com
         
     def read(self):
-        self.com.write(b'n')
-        self.com.waitForReadyRead(-1) #wait forever
+        self.com.write(b'b')
+        self.com.waitForReadyRead(-1) #wait 10ms
         d = self.com.readAll()
         d = d.data()
         
         self.data_ = int(d[0])
     
-    def write(self):
-        self.com.write(bytes([ord('m'), self.data_]))
-    
     def name(self):
-        return "n_gest"
+        return "learning_progress"
