@@ -11,6 +11,8 @@ namespace core {
     uint8_t const i2c_adress = 66;
     uint8_t const max_gest = 30;
     
+    uint8_t const hist_size = 5;
+    
     uint8_t const low = 0;
     uint8_t const high = 1;
     
@@ -31,7 +33,9 @@ namespace core {
     
     uint8_t const begin_learning = 'a';
     uint8_t const learning_progress = 'b';
-    uint8_t const end_learning = 'c';
+    uint8_t const end_learning = 'f';
+    
+    uint8_t const get_last_gestures = 'h';
     
 }//end namespace cmd
 

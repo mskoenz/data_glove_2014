@@ -99,5 +99,23 @@ struct key_data_struct {
     }
 };
 
+struct time_stamp_class {
+    time_stamp_class(): gest(0xFF), time(0) {
+    }
+    time_stamp_class(uint8_t const & gest, uint32_t const & time): gest(gest), time(time) {
+    }
+    template<typename S>
+    void print(S & os) const {
+        os << gest << " @ " << time;
+    }
+    template<typename Archive>
+    void serialize(Archive & ar) {
+        ar & gest;
+        ar & time;
+    }
+    
+    uint8_t gest;
+    uint32_t time;
+};
 
 #endif //__BRIDGE_HEADER

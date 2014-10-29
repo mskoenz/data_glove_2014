@@ -165,6 +165,27 @@ public:
                 com::i2cout(core::i2c_adress) << core::current_gesture << ustd::endl;
                 com::i2cin(core::i2c_adress) >> in;
                 pipe << in;
+            
+            } else if(in == core::begin_learning) {
+                com::uart >> in;
+                uint8_t in2;
+                com::uart >> in2;
+                com::i2cout(core::i2c_adress) << core::begin_learning << in << in2 << ustd::endl;
+                    
+            } else if(in == core::learning_progress) {
+                com::i2cout(core::i2c_adress) << core::learning_progress << ustd::endl;
+                delayMicroseconds(100);
+                uint8_t t;
+                com::i2cin(core::i2c_adress) >> t;
+                pipe << t;
+            } else if(in == core::end_learning) {
+                com::i2cout(core::i2c_adress) << core::end_learning << ustd::endl;
+            } else if(in == core::get_last_gestures) {
+                com::i2cout(core::i2c_adress) << core::get_last_gestures << ustd::endl;
+                delayMicroseconds(200);
+                com::i2cin(core::i2c_adress) >> hist_;
+                pipe << hist_;
+            }
             //~ } else if(in == keyop::read_key) {
                 //~ com::uart >> in;
                 //~ com::uart << data_[in];
@@ -178,16 +199,15 @@ public:
             //~ } else if(in == keyop::write_n_keys) {
                 //~ com::uart >> in;
                 //~ data_.set_size(in);
-            }
         }
         
         for(uint8_t i = 0; i < data_.size(); ++i) {
             if(btn_[i] == state::falling) {
-                ustd::cout << data_[i].key << ustd::endl;
+                //~ ustd::cout << data_[i].key << ustd::endl;
                 keyboard_.press(data_[i].key, data_[i].mod);
             }
             else if(btn_[i] == state::rising) {
-                ustd::cout << data_[i].key << ustd::endl;
+                //~ ustd::cout << data_[i].key << ustd::endl;
                 keyboard_.release(data_[i].key, data_[i].mod);
             }
         }
@@ -199,6 +219,8 @@ public:
 private:
     array_type pos_;
     gesture_class gest_;
+    tool::ring_buffer<time_stamp_class, core::hist_size> hist_;
+    
     tool::depreller_class depreller_;
     
     ustd::array<tool::button_class<tool::fake>, keyop::max_keys> btn_;
@@ -207,6 +229,7 @@ private:
     //~ device::MMA8452_class acc_meter_;
     //~ ustd::lowpass_filter<double, 40> g[3];
     device::bluesmirf_hid_class keyboard_;
+    
 };
 
 #include <main.hpp>

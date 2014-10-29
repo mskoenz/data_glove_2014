@@ -24,13 +24,13 @@ public:
         max_iter_ = iter;
     }
     uint8_t cur_iter;
-    uint8_t const & max_iter() const {
+    volatile uint8_t const & max_iter() const {
         return max_iter_;
     }
     uint8_t id;
     uint8_t pos;
 private:
-    uint8_t max_iter_;
+    volatile uint8_t max_iter_;
 };
 
 #endif //__LEARN_HEADER

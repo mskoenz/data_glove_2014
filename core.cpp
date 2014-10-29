@@ -38,6 +38,11 @@ public:
         
         //~ com::eeprom.clear();
         com::eeprom & gest_;
+        
+        //------------------- init history empty -------------------
+        for(uint8_t i = 0; i < core::hist_size; ++i) {
+            hist_.push_front(time_stamp_class(0xFF, 0));
+        }
     }
     
     void update() {
@@ -58,6 +63,11 @@ public:
                 break;
             }
         }
+        
+        //=================== update history ===================
+        if(curr_gest_ != hist_[0].gest)
+            hist_.push_front(time_stamp_class(curr_gest_, tool::clock.millis()));
+        
     }
     
     void loop() {
@@ -222,14 +232,28 @@ public:
             tool::clock.reset();
         } else if(in == core::read_time) {
             com::i2cout << tool::clock.millis();
-        }
         
         } else if(in == core::begin_learning) {
-            ;
+            com::i2cin >> in;
+            learn_.set_iter(in);
+        
+            com::i2cin >> in;
+            if(in > gest_.size())
+                learn_.pos = gest_.size();
+            else
+                learn_.pos = in;
+            
+            learn_.id = learn_.pos;
+            
         } else if(in == core::learning_progress) {
-            ;
+            com::i2cout << learn_.cur_iter;
         } else if(in == core::end_learning) {
-            ;
+            learn_.set_iter(learn_.cur_iter);
+            //~ gest_.set_size(0xFE);
+            //~ learn_.set_iter(0);
+            //~ learn_.cur_iter = 0;
+        } else if(in == core::get_last_gestures) {
+            com::i2cout << hist_;
         }
         
         //~ if(in == 'l') {
@@ -256,6 +280,8 @@ private:
     ustd::static_vector<gesture_class, core::max_gest> gest_;
     learn_algo_class learn_;
     uint8_t curr_gest_;
+    
+    tool::ring_buffer<time_stamp_class, core::hist_size> hist_;
 };
 
 #include <main.hpp>
