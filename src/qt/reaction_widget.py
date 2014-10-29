@@ -99,12 +99,12 @@ class Q2reaction(QWidget):
         p = self.react.current_msm * 100.0 / self.react.n_msm
         self.progress.setValue(p)
         
-        self.key, delay = self.react.start()
+        self.cur_key, delay = self.react.start()
         self.timer.start(delay)
         self.set_label("wait.png")
         
     def timer_timeout(self):
-        self.set_label(self.key + "_" + self.modus + ".png")
+        self.set_label(self.cur_key + "_" + self.modus + ".png")
         
     def keyPressEvent(self, e):
         if self.start_btn.isEnabled() == True:

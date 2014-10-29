@@ -58,9 +58,7 @@ class Q2calibrate(QWidget):
         def learn_helper(idx):
             def res():
                 if self.learn == True:
-                    print("nope")
                     return
-                print("res {}".format(idx))
                 self.learn = True
                 self.timer.timeout.disconnect(self.timer_timeout)
                 self.begin_learning.data_ = idx
@@ -97,8 +95,6 @@ class Q2calibrate(QWidget):
     def timer_timeout(self):
         
         self.cur_gest.read()
-        
-        print("gest: {}".format(self.cur_gest.data_))
         
         for b, b_i in zipi(self.btn):
             if self.cur_gest.data_ == b_i:

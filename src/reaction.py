@@ -22,6 +22,7 @@ class reaction(object):
         A function that returns a random key from self.key and a random delay in self.delay and appends the pair in self.hist. It also starts the clock.
         """
         key = random.choice(self.key)
+        print("key {} out of {}".format(key, self.key))
         delay = int(random.choice(self.delay) * 1000)
         self.hist.append({"key": key, "delay": delay})
         self.begin = time.time()
