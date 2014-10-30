@@ -82,6 +82,7 @@ inline namespace version_3 {
     //in order to get values between 0-255
     int const cutoff = 1024-680; 
     uint8_t const magnet_length = 20;
+    uint8_t const additional_margin = 5;
     
     uint8_t const m[9] = {5, 7, 8, 3, 4, 1, 2, 0, 6};
     //~ uint8_t const m[9] = {0, 7, 5, 3, 2, 8, 4, 6, 1};

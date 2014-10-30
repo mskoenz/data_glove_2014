@@ -137,8 +137,8 @@ public:
             ASSERT(learn_.pos < gest_.size())
             
             for(uint8_t i = 0; i < 9; ++i) {
-                gest_[learn_.pos].low()[i] = magnet(true, acc[i].min(), i);
-                gest_[learn_.pos].high()[i] = magnet(false, acc[i].max(), i);
+                gest_[learn_.pos].low()[i] = magnet(true, acc[i].min() - additional_margin, i);
+                gest_[learn_.pos].high()[i] = magnet(false, acc[i].max() + additional_margin, i);
                 gest_[learn_.pos].id() = learn_.id;
             }
         }
