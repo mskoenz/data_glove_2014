@@ -22,8 +22,8 @@ class reaction(object):
         A function that returns a random key from self.key and a random delay in self.delay and appends the pair in self.hist. It also starts the clock.
         """
         key = random.choice(self.key)
-        print("key {} out of {}".format(key, self.key))
-        delay = int(random.choice(self.delay) * 1000)
+        #~ print("key {} out of {}".format(key, self.key))
+        delay = int(random.choice(self.delay))
         self.hist.append({"key": key, "delay": delay})
         self.begin = time.time()
         return key, delay
@@ -128,7 +128,7 @@ class reaction(object):
         Pickles the results into a file called name.pickle in the folder ./../data.
         This function never overwrites other files.
         """
-        path = abspath(__file__) + "/../data/"
+        path = abspath(__file__) + "/../data_in/"
         
         nr = 0
         while readable(path + name + "-{:0>2}.pickle".format(nr)):

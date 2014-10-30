@@ -14,11 +14,11 @@ class current_gest_class(object):
         
     def read(self):
         self.com.write(b'c')
-        self.com.waitForReadyRead(-1) #wait forever
+        self.com.waitForReadyRead(100) #wait 100ms
         d = self.com.readAll()
         d = d.data()
-        
-        self.data_ = int(d[0])
+        if len(d) == 1:
+            self.data_ = int(d[0])
     
     def name(self):
         return "current_gest"

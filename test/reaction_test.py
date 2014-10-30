@@ -9,8 +9,8 @@ import package_proxy as px
 import sys
 if __name__ == "__main__":
     print("reaction_test.py")
-    #~ r = px.reaction(['z', 'u', 'i', 'o', 'p'], px.drange(1, 5, .5), 5)
-    r = px.reaction(['z'], [1], 5)
+    #~ r = px.reaction(['z', 'u', 'i', 'o', 'p'], px.drange(1000, 5000, 500), 5)
+    r = px.reaction(['z'], [1000], 5)
     
     while not r.done:
         key, delay = r.start()

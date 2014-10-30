@@ -22,7 +22,7 @@ class survey(object):
         Pickles the userbase into a file called name.pickle in the folder ./../userbase.
         This function overwrites files if same name.
         """
-        path = abspath(__file__) + "/../data/"
+        path = abspath(__file__) + "/../data_in/"
         
         nr = 0
         while readable(path + name + "-{:0>2}.pickle".format(nr)):

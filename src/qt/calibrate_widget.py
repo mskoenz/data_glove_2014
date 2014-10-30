@@ -30,6 +30,7 @@ class Q2calibrate(QWidget):
         self.cur_gest = current_gest_class(self.sp)
         self.begin_learning = begin_learning_class(self.sp)
         self.learning_progress = learning_progress_class(self.sp)
+        self.eeprom = eeprom_write_class(self.sp)
         
         self.learn = False
         
@@ -107,5 +108,6 @@ class Q2calibrate(QWidget):
     
     def done_handler(self):
         self.timer.stop()
+        self.eeprom.write()
         print("Q2calibrate done")
         self.done.emit()
