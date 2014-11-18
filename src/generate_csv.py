@@ -5,9 +5,20 @@
 # Date:    29.10.2014 14:10:44 CET
 # File:    generate_csv.py
 
+#for plot
+import matplotlib
+from matplotlib import rc
+rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+rc('text', usetex=True)
+matplotlib.use('Agg') #only save /no show /must happen before pylab
+import pylab
+#done plot
+
 from src_import import *
 import glob
 from reaction import *
+
+glob_ylim = [500, 1000]
 
 gest_data = []
 key_data = []
@@ -50,15 +61,46 @@ def write_survey_plot_data(name):
     ofs = open(name, "w")
     
     labels = ["calibrate", "comfort", "precision", "dependable", "confine", "speed", "style", "overall"]
-        
+    
+    mea = []
+    std = []
+    err = []
+    
     for l in labels:
         data = []
         for d in surv_data:
             data.append(d[l])
-        
-        ofs.write("{0},{1:.2f},{2:.2f},{3:.2f}\n".format(l, np.mean(data), np.std(data), np.std(data)/np.sqrt(len(surv_data))))
+        mea.append(np.mean(data))
+        std.append(np.std(data))
+        err.append(np.std(data)/np.sqrt(len(surv_data)))
+        ofs.write("{0},{1:.2f},{2:.2f},{3:.2f}\n".format(l, mea[-1], std[-1], err[-1]))
     
     ofs.close()
+    
+    #for plot
+    fig, ax = pylab.subplots()
+    fig.set_size_inches(8.6, 5.2)
+    
+    N = 8
+    width = .6
+    side_space = 0.5
+    ind = np.arange(N)
+    
+    ax.bar(ind+side_space, mea, width, color='r', yerr=err, ecolor = 'k')
+    pylab.xlim([0, N + 2*side_space - (1-width)])
+    
+    ax.set_xticks(ind+width/2+side_space)
+    ax.set_xticklabels(labels)
+    
+    ax.set_yticks([0, 2, 4])
+    ax.set_yticklabels(["bad", "neutral", "good"])
+    
+    ax.set_xlabel("Question", fontsize = 12)
+    ax.set_ylabel("Rating", fontsize = 12, rotation = "horizontal", horizontalalignment = "left")
+    ax.yaxis.set_label_coords(x = 0, y = 1.03)
+    ax.set_title("Survey Data", fontsize = 18, horizontalalignment = "left", y = 1.06, x = 0)
+    pylab.savefig(name.split(".txt")[0]+".tiff")
+    #end plot
 
 def write_mean_plot_data(name):
     ofs = open(name, "w")
@@ -74,10 +116,37 @@ def write_mean_plot_data(name):
     for d in dg:
         dg_mean.append(np.mean(d))
     
-    ofs.write("Keyboard,{0:.2f},{1:.2f},{2:.2f}\n".format(np.mean(kb_mean), np.std(kb_mean), np.std(kb_mean)/np.sqrt(len(kb_mean))))
-    ofs.write("Data Glove,{0:.2f},{1:.2f},{2:.2f}\n".format(np.mean(dg_mean), np.std(dg_mean), np.std(dg_mean)/np.sqrt(len(dg_mean))))
+    mea = [np.mean(kb_mean), np.mean(dg_mean)]
+    std = [np.std(kb_mean), np.std(dg_mean)]
+    err = [np.std(kb_mean)/np.sqrt(len(kb_mean)), np.std(dg_mean)/np.sqrt(len(dg_mean))]
+    
+    ofs.write("Keyboard,{0:.2f},{1:.2f},{2:.2f}\n".format(mea[0], std[0], err[0]))
+    ofs.write("Data Glove,{0:.2f},{1:.2f},{2:.2f}\n".format(mea[1], std[1], err[1]))
     
     ofs.close()
+    
+    #for plot
+    fig, ax = pylab.subplots()
+    fig.set_size_inches(3, 5.2)
+    
+    N = 2
+    width = .6
+    side_space = 0.5
+    ind = np.arange(N)
+    pylab.xlim([0, N + 2*side_space - (1-width)])
+    pylab.ylim(glob_ylim)
+    
+    ax.bar(ind+side_space, mea, width, color='r', yerr=err, ecolor = 'k')
+    
+    ax.set_xticks(ind+width/2+side_space)
+    ax.set_xticklabels(['Keyboard', 'Dataglove'])
+    
+    ax.set_xlabel("Device", fontsize = 12)
+    ax.set_ylabel("Reactiontime [ms]", fontsize = 12, rotation = "horizontal", horizontalalignment = "left")
+    ax.yaxis.set_label_coords(x = 0, y = 1.03)
+    ax.set_title("Mean Reaction", fontsize = 18, horizontalalignment = "left", y = 1.06, x = 0)
+    pylab.savefig(name.split(".txt")[0]+".tiff")
+    #end plot
 
 def write_key_plot_data(name):
     ofs = open(name, "w")
@@ -92,13 +161,43 @@ def write_key_plot_data(name):
     
     L = float(len(mean[0]) + len(mean[1]) + len(mean[2]) + len(mean[3]) + len(mean[4]))
     
+    mea = []
+    std = []
+    err = []
+    
     for l, m in zip(labels, mean):
-        ofs.write(l+",{0:.2f},{1:.2f},{2:.2f},{3:.2f}\n".format(np.mean(m)
-                                                             , np.std(m)
-                                                             , np.std(m) / np.sqrt(len(m))
+        mea.append(np.mean(m))
+        std.append(np.std(m))
+        err.append(np.std(m) / np.sqrt(len(m)))
+        ofs.write(l+",{0:.2f},{1:.2f},{2:.2f},{3:.2f}\n".format(mea[-1]
+                                                             , std[-1]
+                                                             , err[-1]
                                                              , len(m) / L))
     ofs.close()
-
+    
+    #for plot
+    fig, ax = pylab.subplots()
+    fig.set_size_inches(3.6, 5.2)
+    
+    N = 5
+    width = .6
+    side_space = 0.5
+    ind = np.arange(N)
+    pylab.xlim([0, N + 2*side_space - (1-width)])
+    pylab.ylim(glob_ylim)
+    
+    ax.bar(ind+side_space, mea, width, color='r', yerr=err, ecolor = 'k')
+    
+    ax.set_xticks(ind+width/2+side_space)
+    ax.set_xticklabels(keys)
+    
+    ax.set_xlabel("Key", fontsize = 12)
+    ax.set_ylabel("Reactiontime [ms]", fontsize = 12, rotation = "horizontal", horizontalalignment = "left")
+    ax.yaxis.set_label_coords(x = 0, y = 1.03)
+    ax.set_title("Mean Reaction Keyboard", fontsize = 18, horizontalalignment = "left", y = 1.06, x = 0)
+    pylab.savefig(name.split(".txt")[0]+".tiff")
+    #end plot
+    
 def write_gest_plot_data(name):
     ofs = open(name, "w")
     
@@ -112,12 +211,42 @@ def write_gest_plot_data(name):
     
     L = float(len(mean[0]) + len(mean[1]) + len(mean[2]) + len(mean[3]) + len(mean[4]))
     
+    mea = []
+    std = []
+    err = []
+    
     for l, m in zip(labels, mean):
-        ofs.write(l+",{0:.2f},{1:.2f},{2:.2f},{3:.2f}\n".format(np.mean(m)
-                                                             , np.std(m)
-                                                             , np.std(m) / np.sqrt(len(m))
+        mea.append(np.mean(m))
+        std.append(np.std(m))
+        err.append(np.std(m) / np.sqrt(len(m)))
+        ofs.write(l+",{0:.2f},{1:.2f},{2:.2f},{3:.2f}\n".format(mea[-1]
+                                                             , std[-1]
+                                                             , err[-1]
                                                              , len(m) / L))
     ofs.close()
+    
+    #for plot
+    fig, ax = pylab.subplots()
+    fig.set_size_inches(3.6, 5.2)
+    
+    N = 5
+    width = .6
+    side_space = 0.5
+    ind = np.arange(N)
+    pylab.xlim([0, N + 2*side_space - (1-width)])
+    pylab.ylim(glob_ylim)
+    
+    ax.bar(ind+side_space, mea, width, color='r', yerr=err, ecolor = 'k')
+    
+    ax.set_xticks(ind+width/2+side_space)
+    ax.set_xticklabels(["1", "2", "3", "4", "5"])
+    
+    ax.set_xlabel("Gesture", fontsize = 12)
+    ax.set_ylabel("Reactiontime [ms]", fontsize = 12, rotation = "horizontal", horizontalalignment = "left")
+    ax.yaxis.set_label_coords(x = 0, y = 1.03)
+    ax.set_title("Mean Reaction Dataglove", fontsize = 18, horizontalalignment = "left", y = 1.06, x = 0)
+    pylab.savefig(name.split(".txt")[0]+".tiff")
+    #end plot
 
 def write_key_delay_plot_data(name):
     ofs = open(name, "w")
@@ -135,14 +264,44 @@ def write_key_delay_plot_data(name):
     
     for m in mean:
         L += len(m);
-        
+    
+    mea = []
+    std = []
+    err = []
+    
     for l, m in zip(labels, mean):
+        mea.append(np.mean(m))
+        std.append(np.std(m))
+        err.append(np.std(m) / np.sqrt(len(m)))
         ofs.write(l+",{0:.2f},{1:.2f},{2:.2f},{3:.2f}\n".format(np.mean(m)
                                                              , np.std(m)
                                                              , np.std(m) / np.sqrt(len(m))
                                                              , len(m) / L))
     ofs.close()
-
+    
+    #for plot
+    fig, ax = pylab.subplots()
+    fig.set_size_inches(5.6, 5.2)
+    
+    N = 8
+    width = .6
+    side_space = 0.5
+    ind = np.arange(N)
+    pylab.xlim([0, N + 2*side_space - (1-width)])
+    pylab.ylim(glob_ylim)
+    
+    ax.bar(ind+side_space, mea, width, color='r', yerr=err, ecolor = 'k')
+    
+    ax.set_xticks(ind+width/2+side_space)
+    ax.set_xticklabels([1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5])
+    
+    ax.set_xlabel("Delay [s]", fontsize = 12)
+    ax.set_ylabel("Reactiontime [ms]", fontsize = 12, rotation = "horizontal", horizontalalignment = "left")
+    ax.yaxis.set_label_coords(x = 0, y = 1.03)
+    ax.set_title("Delay-Reaction Keyboard", fontsize = 18, horizontalalignment = "left", y = 1.06, x = 0)
+    pylab.savefig(name.split(".txt")[0]+".tiff")
+    #end plot
+    
 def write_gest_delay_plot_data(name):
     ofs = open(name, "w")
     
@@ -159,13 +318,43 @@ def write_gest_delay_plot_data(name):
     
     for m in mean:
         L += len(m);
-        
+    
+    mea = []
+    std = []
+    err = []
+    
     for l, m in zip(labels, mean):
+        mea.append(np.mean(m))
+        std.append(np.std(m))
+        err.append(np.std(m) / np.sqrt(len(m)))
         ofs.write(l+",{0:.2f},{1:.2f},{2:.2f},{3:.2f}\n".format(np.mean(m)
                                                              , np.std(m)
                                                              , np.std(m) / np.sqrt(len(m))
                                                              , len(m) / L))
     ofs.close()
+    
+    #for plot
+    fig, ax = pylab.subplots()
+    fig.set_size_inches(5.6, 5.2)
+    
+    N = 8
+    width = .6
+    side_space = 0.5
+    ind = np.arange(N)
+    pylab.xlim([0, N + 2*side_space - (1-width)])
+    pylab.ylim(glob_ylim)
+    
+    ax.bar(ind+side_space, mea, width, color='r', yerr=err, ecolor = 'k')
+    
+    ax.set_xticks(ind+width/2+side_space)
+    ax.set_xticklabels([1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5])
+    
+    ax.set_xlabel("Delay [s]", fontsize = 12)
+    ax.set_ylabel("Reactiontime [ms]", fontsize = 12, rotation = "horizontal", horizontalalignment = "left")
+    ax.yaxis.set_label_coords(x = 0, y = 1.03)
+    ax.set_title("Delay-Reaction Dataglove", fontsize = 18, horizontalalignment = "left", y = 1.06, x = 0)
+    pylab.savefig(name.split(".txt")[0]+".tiff")
+    #end plot
 
 def write_n_t_plot_data(name):
     ofs = open(name, "w")
@@ -185,12 +374,42 @@ def write_n_t_plot_data(name):
     L = float(0)
     L += len(mean[0]);
     
+    mea = []
+    std = []
+    err = []
+    
     for l, m in zip(labels, mean):
-        ofs.write(str(l+1)+",{0:.2f},{1:.2f},{2:.2f}\n".format(np.mean(m)
-                                                             , np.std(m)
-                                                             , np.std(m) / np.sqrt(len(m))
+        mea.append(np.mean(m))
+        std.append(np.std(m))
+        err.append(np.std(m) / np.sqrt(len(m)))
+        ofs.write(str(l+1)+",{0:.2f},{1:.2f},{2:.2f}\n".format(mea[-1]
+                                                             , std[-1]
+                                                             , err[-1]
                                                              ))
     ofs.close()
+    
+    #for plot
+    fig, ax = pylab.subplots()
+    fig.set_size_inches(8.6, 5.2)
+    
+    N = 30
+    width = .6
+    side_space = 0.5
+    ind = np.arange(N)
+    pylab.xlim([0, N + 2*side_space - (1-width)])
+    pylab.ylim(glob_ylim)
+    
+    ax.bar(ind+side_space, mea, width, color='r', yerr=err, ecolor = 'k')
+    
+    ax.set_xticks(ind+width/2+side_space)
+    ax.set_xticklabels(range(1, 31))
+    
+    ax.set_xlabel("Measurement Step", fontsize = 12)
+    ax.set_ylabel("Reactiontime [ms]", fontsize = 12, rotation = "horizontal", horizontalalignment = "left")
+    ax.yaxis.set_label_coords(x = 0, y = 1.03)
+    ax.set_title("Duration-Reaction", fontsize = 18, horizontalalignment = "left", y = 1.06, x = 0)
+    pylab.savefig(name.split(".txt")[0]+".tiff")
+    #end plot
 
 def write_fail_plot_data(name):
     ofs = open(name, "w")
@@ -222,14 +441,49 @@ def write_fail_plot_data(name):
     
     L = float(len(mean[-1]))
     
+    mea = []
+    std = []
+    err = []
+    per = []
+    pererr = []
+    
     for l, m in zip(labels, mean):
-        ofs.write(str(l)+",{0:.2f},{1:.2f},{2:.2f},{3:.2f}\n".format(np.mean(m)
-                                                             , np.std(m)
-                                                             , np.std(m) / np.sqrt(len(m))
-                                                             , np.mean(m) / L
+        mea.append(np.mean(m))
+        std.append(np.std(m))
+        err.append(np.std(m) / np.sqrt(len(m)))
+        per.append(100*np.mean(m) / 30)
+        pererr.append(100*np.std(m) / np.sqrt(len(m)) / 30)
+        ofs.write(str(l)+",{0:.2f},{1:.2f},{2:.2f},{3:.2f}\n".format(mea[-1]
+                                                             , std[-1]
+                                                             , err[-1]
+                                                             , per[-1]/100
                                                              ))
     ofs.close()
-
+    
+    mea = per
+    err = pererr
+    
+    #for plot
+    fig, ax = pylab.subplots()
+    fig.set_size_inches(5.6, 5.2)
+    
+    N = 4
+    width = .6
+    side_space = 0.5
+    ind = np.arange(N)
+    pylab.xlim([0, N + 2*side_space - (1-width)])
+    
+    ax.bar(ind+side_space, mea, width, color='r', yerr=err, ecolor = 'k')
+    
+    ax.set_xticks(ind+width/2+side_space)
+    ax.set_xticklabels(labels)
+    
+    ax.set_xlabel("Device", fontsize = 12)
+    ax.set_ylabel("Percent [\%]", fontsize = 12, rotation = "horizontal", horizontalalignment = "left")
+    ax.yaxis.set_label_coords(x = 0, y = 1.03)
+    ax.set_title("Late/Wrong Input", fontsize = 18, horizontalalignment = "left", y = 1.06, x = 0)
+    pylab.savefig(name.split(".txt")[0]+".tiff")
+    #end plot
 
 def convert_old(name):
     f = open(name, "r")
@@ -315,14 +569,15 @@ if __name__ == "__main__":
     
     
     load_files()
-    path = abspath(__file__) + "/../data_out/"
+    #~ path = abspath(__file__) + "/../data_out/"
+    path = "/home/msk/Dropbox/sync/2014_data_glove/fig/"
     ending = ".txt"
-    write_mean_plot_data(path + "mean" + ending)
-    write_survey_plot_data(path + "survey" + ending)
-    write_key_plot_data(path + "key" + ending)
-    write_gest_plot_data(path + "gest" + ending)
+    write_mean_plot_data(path + "fig_mean" + ending)
+    write_survey_plot_data(path + "fig_survey" + ending)
+    write_key_plot_data(path + "fig_key" + ending)
+    write_gest_plot_data(path + "fig_gest" + ending)
     
-    write_key_delay_plot_data(path + "key_delay" + ending)
-    write_gest_delay_plot_data(path + "gest_delay" + ending)
-    write_n_t_plot_data(path + "n_t" + ending)
-    write_fail_plot_data(path + "fail" + ending)
+    write_key_delay_plot_data(path + "fig_key_delay" + ending)
+    write_gest_delay_plot_data(path + "fig_gest_delay" + ending)
+    write_n_t_plot_data(path + "fig_n_t" + ending)
+    write_fail_plot_data(path + "fig_fail" + ending)

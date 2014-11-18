@@ -25,6 +25,7 @@ class Q2reaction(QWidget):
         self.trial_text = lg.react_trial
         self.msm_text = lg.react_measurement
         self.done_text = lg.react_done
+        self.taub_ = False
         self.init_ui()
     
     def init_ui(self):
@@ -38,14 +39,17 @@ class Q2reaction(QWidget):
         self.done_btn = QPushButton("ok", self)
         
         self.timer = QTimer(self)
+        self.taub = QTimer(self)
         
         #=================== properties ===================
         self.setup()
         self.timer.setSingleShot(True)
+        self.taub.setSingleShot(True)
         
         #=================== connects ===================
         self.start_btn.clicked.connect(self.start_msm)
         self.timer.timeout.connect(self.timer_timeout)
+        self.taub.timeout.connect(self.taub_timeout)
         self.done_btn.pressed.connect(self.done_handler)
         
         #=================== layout ===================
@@ -105,10 +109,20 @@ class Q2reaction(QWidget):
         
     def timer_timeout(self):
         self.set_label(self.cur_key + "_" + self.modus + ".png")
+    
+    def taub_timeout(self):
+        self.taub_ = False
         
     def keyPressEvent(self, e):
+        if self.taub_ == True:
+            return
+        
+        self.taub_ = True
+        self.taub.start(500)
+        
         if self.start_btn.isEnabled() == True:
             return
+        
         
         state = self.react.stop(e.text())
         if state != "valid":
@@ -122,6 +136,7 @@ class Q2reaction(QWidget):
             print(self.react.evaluate)
             self.set_label("done.png")
             self.done_btn.setEnabled(True)
+        
     
     def done_handler(self):
         if self.start_btn.text() == self.trial_text:
